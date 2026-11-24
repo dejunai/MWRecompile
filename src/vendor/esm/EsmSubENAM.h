@@ -1,0 +1,154 @@
+/*===========================================================================
+ *
+ * File:    EsmsubENAM.H
+ * Author:  Dave Humphrey (uesp@m0use.net)
+ * Created On:  February 3, 2003
+ *
+ * Description
+ *
+ *=========================================================================*/
+#ifndef __ESMSUBENAM_H
+#define __ESMSUBENAM_H
+
+
+#include "esm/EsmSubBase.h"
+
+
+#define MWESM_ALCH_MAXENCHANTS    8
+
+/* Range types */
+#define MWESM_ENCHANTRANGE_MIN    0
+#define MWESM_ENCHANTRANGE_SELF   0
+#define MWESM_ENCHANTRANGE_TOUCH  1
+#define MWESM_ENCHANTRANGE_TARGET 2
+#define MWESM_ENCHANTRANGE_MAX    2
+
+
+#pragma pack(push, 1)
+
+typedef struct {
+	short EffectID;
+	byte SkillID;
+	byte AttributeID;
+	long RangeType;
+	long Area;
+	long Duration;
+	long MagMin;
+	long MagMax;
+} enchanteffect_t;
+
+#pragma pack(pop)
+
+
+/*===========================================================================
+ *
+ * Begin Class CEsmSubENAM Definition
+ *
+ * Description
+ *
+ *=========================================================================*/
+class CEsmSubENAM : public CEsmSubRecord {
+  public:
+	/* Class Constructors/Destructors */
+	//CEsmSubENAM();
+	//virtual ~CEsmSubENAM() { Destroy(); }
+	//virtual void Destroy (void);
+
+	/* Create a name object */
+	static CEsmSubRecord *Create() {
+		CEsmSubRecord *pSubRecord;
+		CreatePointerL(pSubRecord, CEsmSubENAM);
+		return pSubRecord;
+	}
+
+	/* Create a new sub-record */
+	virtual void CreateNew() {
+		CEsmSubRecord::CreateNew();
+		CreateArrayPointerL(m_pData, byte, sizeof(enchanteffect_t));
+		m_RecordSize = sizeof(enchanteffect_t);
+		memset(m_pData, 0, sizeof(enchanteffect_t));
+		GetEnchantData()->EffectID = -1;
+		GetEnchantData()->SkillID = -1;
+		GetEnchantData()->AttributeID = -1;
+	}
+
+	/* Get class methods */
+	enchanteffect_t *GetEnchantData() {
+		return (enchanteffect_t *)m_pData;
+	}
+
+	short GetEffectID() {
+		return GetEnchantData()->EffectID;
+	}
+
+	byte GetSkillID() {
+		return GetEnchantData()->SkillID;
+	}
+
+	byte GetAttributeID() {
+		return GetEnchantData()->AttributeID;
+	}
+
+	long GetRangeType() {
+		return GetEnchantData()->RangeType;
+	}
+
+	long GetArea() {
+		return GetEnchantData()->Area;
+	}
+
+	long GetDuration() {
+		return GetEnchantData()->Duration;
+	}
+
+	long GetMagMin() {
+		return GetEnchantData()->MagMin;
+	}
+
+	long GetMagMax() {
+		return GetEnchantData()->MagMax;
+	}
+
+	/* Checks if the sub-record uses the given ID */
+	virtual bool IsUsed(const TCHAR *pID) {
+		return StringCompare(GetESMEffect(GetEnchantData()->EffectID), pID, false) == 0;
+	}
+
+	/* Set class members */
+	void SetEffectID(const int Value) {
+		GetEnchantData()->EffectID = Value;
+	}
+
+	void SetSkillID(const byte Value) {
+		GetEnchantData()->SkillID = Value;
+	}
+
+	void SetAttributeID(const byte Value) {
+		GetEnchantData()->AttributeID = Value;
+	}
+
+	void SetRangeType(const long Value) {
+		if (Value >= MWESM_ENCHANTRANGE_MIN && Value <= MWESM_ENCHANTRANGE_MAX) {
+			GetEnchantData()->RangeType = Value;
+		}
+	}
+
+	void SetArea(const long Value) {
+		GetEnchantData()->Area = Value;
+	}
+
+	void SetDuration(const long Value) {
+		GetEnchantData()->Duration = Value;
+	}
+
+	void SetMagMin(const long Value) {
+		GetEnchantData()->MagMin = Value;
+	}
+
+	void SetMagMax(const long Value) {
+		GetEnchantData()->MagMax = Value;
+	}
+};
+
+
+#endif

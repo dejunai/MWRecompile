@@ -1,0 +1,116 @@
+/*===========================================================================
+ *
+ * File:    EsmsubAI_F.H
+ * Author:  Dave Humphrey (uesp@m0use.net)
+ * Created On:  February 3, 2003
+ *
+ * Description
+ *
+ *=========================================================================*/
+#ifndef __ESMSUBAI_F_H
+#define __ESMSUBAI_F_H
+
+
+#include "esm/EsmSubBase.h"
+
+
+#pragma pack(push, 1)
+
+typedef struct {
+	float X;
+	float Y;
+	float Z;
+	short Duration;
+	char ID[32];
+	short Unknown;
+} ai_fdata_t;
+
+#pragma pack(pop)
+
+
+/*===========================================================================
+ *
+ * Begin Class CEsmSubAI_F Definition
+ *
+ * Description
+ *
+ *=========================================================================*/
+class CEsmSubAI_F : public CEsmSubRecord {
+  public:
+	/* Class Constructors/Destructors */
+	//CEsmSubAI_F();
+	//virtual ~CEsmSubAI_F() { Destroy(); }
+	//virtual void Destroy (void);
+
+	/* Create a name object */
+	static CEsmSubRecord *Create() {
+		CEsmSubRecord *pSubRecord;
+		CreatePointerL(pSubRecord, CEsmSubAI_F);
+		return pSubRecord;
+	}
+
+	/* Create a new sub-record */
+	virtual void CreateNew() {
+		CEsmSubRecord::CreateNew();
+		CreateArrayPointerL(m_pData, byte, sizeof(ai_fdata_t));
+		m_RecordSize = sizeof(ai_fdata_t);
+		memset(m_pData, 0, sizeof(ai_fdata_t));
+	}
+
+	/* Get class methods */
+	ai_fdata_t *GetAIData() {
+		return (ai_fdata_t *)m_pData;
+	}
+
+	float GetXPos() {
+		return GetAIData()->X;
+	}
+
+	float GetYPos() {
+		return GetAIData()->Y;
+	}
+
+	float GetZPos() {
+		return GetAIData()->Z;
+	}
+
+	short GetDuration() {
+		return GetAIData()->Duration;
+	}
+
+	short GetUnknown() {
+		return GetAIData()->Unknown;
+	}
+
+	const TCHAR *GetID() {
+		return GetAIData()->ID;
+	}
+
+	/* Set class members */
+	void SetXPos(const float Value) {
+		GetAIData()->X = Value;
+	}
+
+	void SetYPos(const float Value) {
+		GetAIData()->Y = Value;
+	}
+
+	void SetZPos(const float Value) {
+		GetAIData()->Z = Value;
+	}
+
+	void SetDuration(const short Value) {
+		GetAIData()->Duration = Value;
+	}
+
+	void SetUnknown(const short Value) {
+		GetAIData()->Unknown = Value;
+	}
+
+	void SetID(const TCHAR *pString) {
+		TSTRNCPY(GetAIData()->ID, pString, 32);
+	}
+};
+
+
+#endif

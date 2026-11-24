@@ -1,0 +1,164 @@
+/*===========================================================================
+ *
+ * File:    EsmsubIRDT.H
+ * Author:  Dave Humphrey (uesp@m0use.net)
+ * Created On:  February 3, 2003
+ *
+ * Description
+ *
+ *=========================================================================*/
+#ifndef __ESMSUBIRDT_H
+#define __ESMSUBIRDTXH
+
+
+#include "esm/EsmSubBase.h"
+
+
+/* Number of effects per ingrediant */
+#define MWESM_INGRE_NUMEFFECTS 4
+
+
+#pragma pack(push, 1)
+
+typedef struct {
+	float Weight;
+	long Value;
+	long EffectID[MWESM_INGRE_NUMEFFECTS];
+	long SkillID[MWESM_INGRE_NUMEFFECTS];
+	long AttributeID[MWESM_INGRE_NUMEFFECTS];
+} ingredata_t;
+
+#pragma pack(pop)
+
+
+/*===========================================================================
+ *
+ * Begin Class CEsmSubIRDT Definition
+ *
+ * Description
+ *
+ *=========================================================================*/
+class CEsmSubIRDT : public CEsmSubRecord {
+  public:
+	/* Class Constructors/Destructors */
+	//CEsmSubIRDT();
+	//virtual ~CEsmSubIRDT() { Destroy(); }
+	//virtual void Destroy (void);
+
+	/* Create a name object */
+	static CEsmSubRecord *Create() {
+		CEsmSubRecord *pSubRecord;
+		CreatePointerL(pSubRecord, CEsmSubIRDT);
+		return pSubRecord;
+	}
+
+	/* Create a new sub-record */
+	virtual void CreateNew() {
+		CEsmSubRecord::CreateNew();
+		CreateArrayPointerL(m_pData, byte, sizeof(ingredata_t));
+		m_RecordSize = sizeof(ingredata_t);
+		memset(m_pData, 0, sizeof(ingredata_t));
+
+		GetIngreData()->EffectID[0] = -1;
+		GetIngreData()->EffectID[1] = -1;
+		GetIngreData()->EffectID[2] = -1;
+		GetIngreData()->EffectID[3] = -1;
+
+		GetIngreData()->SkillID[0] = -1;
+		GetIngreData()->SkillID[1] = -1;
+		GetIngreData()->SkillID[2] = -1;
+		GetIngreData()->SkillID[3] = -1;
+
+		GetIngreData()->AttributeID[0] = -1;
+		GetIngreData()->AttributeID[1] = -1;
+		GetIngreData()->AttributeID[2] = -1;
+		GetIngreData()->AttributeID[3] = -1;
+	}
+
+	/* Get class members */
+	ingredata_t *GetIngreData() {
+		return (ingredata_t *)m_pData;
+	}
+
+	float GetWeight() {
+		return GetIngreData()->Weight;
+	}
+
+	long GetValue() {
+		return GetIngreData()->Value;
+	}
+
+	bool IsValidEffect(const int Index) {
+		return Index >= 0 && Index < MWESM_INGRE_NUMEFFECTS;
+	}
+
+	long GetEffectID(const int Index) {
+		return IsValidEffect(Index) ? GetIngreData()->EffectID[Index] : 0;
+	}
+
+	long GetSkillID(const int Index) {
+		return IsValidEffect(Index) ? GetIngreData()->SkillID[Index] : 0;
+	}
+
+	long GetAttributeID(const int Index) {
+		return IsValidEffect(Index) ? GetIngreData()->AttributeID[Index] : 0;
+	}
+
+	/* Checks if the sub-record uses the given ID */
+	virtual bool IsUsed(const TCHAR *pID);
+
+	/* Set class members */
+	void SetWeight(const float Value) {
+		GetIngreData()->Weight = Value;
+	}
+
+	void SetValue(const long Value) {
+		GetIngreData()->Value = Value;
+	}
+
+	void SetEffectID(const int Index, const long Value) {
+		if (IsValidEffect(Index)) {
+			GetIngreData()->EffectID[Index] = Value;
+		}
+	}
+
+	void SetSkillID(const int Index, const long Value) {
+		if (IsValidEffect(Index)) {
+			GetIngreData()->SkillID[Index] = Value;
+		}
+	}
+
+	void SetAttributeID(const int Index, const long Value) {
+		if (IsValidEffect(Index)) {
+			GetIngreData()->AttributeID[Index] = Value;
+		}
+	}
+};
+
+
+/*===========================================================================
+ *
+ * Class bool CEsmSubIRDT Method - inline IsUsed (pID) const;
+ *
+ *=========================================================================*/
+inline bool CEsmSubIRDT::IsUsed(const TCHAR *pID) {
+	bool Result;
+	int Index;
+
+	for (Index = 0; Index < MWESM_INGRE_NUMEFFECTS; Index++) {
+		if (GetIngreData()->EffectID[Index] < 0) {
+			continue;
+		}
+
+		Result = StringCompare(GetESMEffect(GetIngreData()->EffectID[Index]), pID, false) == 0;
+
+		if (Result) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+#endif

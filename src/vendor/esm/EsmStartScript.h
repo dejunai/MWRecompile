@@ -1,0 +1,77 @@
+/*===========================================================================
+ *
+ * File:    Esmstartscript.H
+ * Author:  Dave Humphrey (uesp@m0use.net)
+ * Created On:  September 13, 2003
+ *
+ * Description
+ *
+ *=========================================================================*/
+#ifndef __ESMSTARTSCRIPT_H
+#define __ESMSTARTSCRIPT_H
+
+
+#include "esm/EsmRecord.h"
+#include "esm/EsmSubName.h"
+#include "esm/EsmSubLong.h"
+#include "esm/EsmSubName32.h"
+
+
+/*===========================================================================
+ *
+ * Begin Class CEsmStartScript Definition
+ *
+ * Description
+ *
+ *=========================================================================*/
+class CEsmStartScript : public CEsmRecord {
+	DECLARE_SUBRECCREATE();
+
+  protected:
+	CEsmSubNameFix *m_pName;
+
+
+  public:
+	/* Class Constructors/Destructors */
+	CEsmStartScript();
+	//virtual ~CEsmStartScript() { Destroy(); }
+	virtual void Destroy();
+
+	/* Compare two fields of the record */
+	virtual int CompareFields(const int FieldID, CEsmRecord *pRecord);
+
+	/* Return a new record object */
+	static CEsmRecord *Create();
+
+	/* Create a new, empty, record */
+	virtual void CreateNew(CEsmFile *pFile);
+
+	/* Get a string representation of a particular field */
+	virtual const TCHAR *GetFieldString(const int FieldID);
+
+	/* Return a text representation of the item type */
+	virtual const TCHAR *GetItemType() {
+		return _T("Start Script");
+	}
+
+	/* Get class members */
+	const TCHAR *GetName() {
+		return m_pName ? m_pName->GetName() : _T("");
+	}
+
+	/* Used to save the various record elements */
+	virtual void OnAddSubRecord(CEsmSubRecord *pSubRecord);
+
+	/* Set class members */
+	void SetName(const TCHAR *pString) {
+		if (m_pName) {
+			m_pName->SetName(pString);
+		}
+	}
+
+	/* Set a certain field of the record */
+	virtual bool SetFieldValue(const int FieldID, const TCHAR *pString);
+};
+
+
+#endif

@@ -1,0 +1,93 @@
+/*===========================================================================
+ *
+ * File:    Mwcommon.CPP
+ * Author:  Dave Humphrey (uesp@m0use.net)
+ * Created On:  December 29, 2003
+ *
+ * Contains common functions for Morrowind related projects.
+ *
+ *=========================================================================*/
+#include "project/StdAfx.h"
+#include "esm/mwcommon.h"
+#include "Windows/WinUtil.h"
+#include "Common/dl_file.h"
+
+
+DEFINE_FILE("MWCommon.cpp");
+
+
+/*===========================================================================
+ *
+ * Function - const TCHAR* GetMWInstallPath (void);
+ *
+ * Returns the absolute path of the Morrowind installation as stored in
+ * the Windows registry. Returns an empty string if the expected keys
+ * were not found.
+ *
+ *=========================================================================*/
+const TCHAR *GetMWInstallPath() {
+	static TCHAR Buffer[_MAX_PATH + 8];
+	DWORD BufferSize = _MAX_PATH + 7;
+	DWORD Type;
+	HKEY hKey;
+	long Result;
+	Result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, MWESM_REG_PATH, 0, KEY_QUERY_VALUE, &hKey);
+
+	if (Result != ERROR_SUCCESS) {
+		return _T("");
+	}
+
+	Result = RegQueryValueEx(hKey, _T("Installed Path"), NULL, &Type, (BYTE *)Buffer, &BufferSize);
+	RegCloseKey(hKey);
+
+	if (Result != ERROR_SUCCESS) {
+		return _T("");
+	}
+
+	TerminatePath(Buffer);
+	return Buffer;
+}
+
+
+/*===========================================================================
+ *
+ * Function - const TCHAR* GetMWDataFilePath (void);
+ *
+ * Returns the absolute path of the Morrowind "Data Files" game path as
+ * stored in the Windows registry. Returns an empty string if the
+ * expected keys were not found.
+ *
+ *=========================================================================*/
+const TCHAR *GetMWDataFilePath() {
+	static TCHAR Buffer[_MAX_PATH + 24];
+	TSTRCPY(Buffer, GetMWInstallPath());
+
+	if (Buffer[0] == NULL_CHAR) {
+		return _T("");
+	}
+
+	TSTRCAT(Buffer, _T("Data Files\\"));
+	return Buffer;
+}
+
+
+/*===========================================================================
+ *
+ * Function - const TCHAR* GetMWTexturesPath (void);
+ *
+ * Returns the absolute path of the Morrowind "Data Files\Textures" game
+ * path as stored in the Windows registry. Returns an empty string if the
+ * expected keys were not found.
+ *
+ *=========================================================================*/
+const TCHAR *GetMWTexturesPath() {
+	static TCHAR Buffer[_MAX_PATH + 32];
+	TSTRCPY(Buffer, GetMWInstallPath());
+
+	if (Buffer[0] == NULL_CHAR) {
+		return _T("");
+	}
+
+	TSTRCAT(Buffer, _T("Data Files\\Textures\\"));
+	return Buffer;
+}
